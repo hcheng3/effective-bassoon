@@ -11,7 +11,7 @@ function generateX() {
   return x;
 }
 
-$.get('http://localhost:3000/weather', function(data) {
+$.get('/weather', function(data) {
   var parsedData = JSON.parse(data);
   var lat = parsedData.coord.lat;
   var lon = parsedData.coord.lon;

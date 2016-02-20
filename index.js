@@ -15,6 +15,8 @@ app.get('/weather', function (req, res) {
 
 app.use('/assets', express.static('assets'));
 
+app.use('/data', express.static('data'));
+
 app.get('/', function(req, res) {
     res.sendfile(__dirname + '/index.html')
 });
