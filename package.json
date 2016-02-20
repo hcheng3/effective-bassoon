@@ -1,0 +1,23 @@
+{
+  "name": "effective-bassoon",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinkucharczyk/effective-bassoon.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kevinkucharczyk/effective-bassoon/issues"
+  },
+  "homepage": "https://github.com/kevinkucharczyk/effective-bassoon#readme",
+  "dependencies": {
+    "jsonfile": "^2.2.3",
+    "request-promise": "^2.0.1"
+  }
+}
