@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kevinkucharczyk/effective-bassoon#readme",
   "dependencies": {
+    "express": "^4.13.4",
     "jsonfile": "^2.2.3",
     "request-promise": "^2.0.1"
   }
