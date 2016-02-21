@@ -21,30 +21,36 @@ var yAxis = d3.svg.axis()
 var color = d3.scale.category10();
 
 d3.csv("data/flowers.csv", function(error, data) {
-  if (error) throw error;
+    if (error) throw error;
 
-  var domainByTrait = {},
-      traits = d3.keys(data[0]).filter(function(d) { return d !== "species"; }),
-      n = traits.length;
+    var domainByTrait = {};
+    var traits = d3.keys(data[0]).filter(function(d) { return d !== "species"; });
+    var n = traits.length;
 
-  traits.forEach(function(trait) {
-    domainByTrait[trait] = d3.extent(data, function(d) { return d[trait]; });
-  });
+    // This get some kind of ranges for each data series ('petal width' and so on)
+    traits.forEach(function(trait) {
+        domainByTrait[trait] = d3.extent(data, function(d) { return d[trait]; });
+    });
 
-  xAxis.tickSize(size * n);
-  yAxis.tickSize(-size * n);
+    xAxis.tickSize(size * n);
+    yAxis.tickSize(-size * n);
 
-  var svg = d3.select("body").append("svg")
-      .attr("width", size * n + padding)
-      .attr("height", size * n + padding)
-    .append("g")
-      .attr("transform", "translate(" + padding + "," + padding / 2 + ")");
+    // Create svg element
+    var svg = d3.select("body").append("svg")
+        .attr("width", size * n + padding)
+        .attr("height", size * n + padding)
+        .append("g")
+            .attr("transform", "translate(" + padding + "," + padding / 2 + ")");
 
   svg.selectAll(".x.axis")
       .data(traits)
     .enter().append("g")
       .attr("class", "x axis")
-      .attr("transform", function(d, i) { return "translate(" + (n - i - 1) * size + ",0)"; })
+      .attr("transform", function(d, i) {
+          console.log(i);
+          console.log(d);
+          return "translate(" + (n - i - 1) * size + ",0)";
+      })
       .each(function(d) { x.domain(domainByTrait[d]); d3.select(this).call(xAxis); });
 
   svg.selectAll(".y.axis")
@@ -91,9 +97,19 @@ d3.csv("data/flowers.csv", function(error, data) {
   }
 
   function cross(a, b) {
-    var c = [], n = a.length, m = b.length, i, j;
-    for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
-    return c;
+    // This function does something, what is it
+    var out = [];
+
+    for (var i = 0; i < a.length; i++) {
+        for (var j = 0; j < b.length; j++) {
+            var val = {x: a[i],
+                       i: i,
+                       y: b[j],
+                       j: j};
+            out.push(val);
+        }
+    }
+    return out;
   }
 
   d3.select(self.frameElement).style("height", size * n + padding + 20 + "px");
