@@ -11,12 +11,12 @@ var y = d3.scale.linear()
 var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom")
-    .ticks(5);
+    .ticks(17);
 
 var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left")
-    .ticks(5);
+    .ticks(9);
 
 var color = d3.scale.category10();
 
@@ -42,75 +42,96 @@ d3.csv("data/flowers.csv", function(error, data) {
         .append("g")
             .attr("transform", "translate(" + padding + "," + padding / 2 + ")");
 
-  svg.selectAll(".x.axis")
-      .data(traits)
-    .enter().append("g")
-      .attr("class", "x axis")
-      .attr("transform", function(d, i) {
-          console.log(i);
-          console.log(d);
-          return "translate(" + (n - i - 1) * size + ",0)";
-      })
-      .each(function(d) { x.domain(domainByTrait[d]); d3.select(this).call(xAxis); });
+    // Create vertical axes
+    svg.selectAll(".x.axis")
+        // Bunch of setters
+        .data(traits)
+        .enter().append("g")
+            .attr("class", "x axis")
+            .attr("transform", function(d, i) {
+                return "translate(" + (n - i - 1) * size + ",0)";
+            })
+        // Actual construction
+        .each(function(d) {
+            // Rescale x-range
+            x.domain(domainByTrait[d]);
+            // dafuq is that for
+            d3.select(this).call(xAxis);
+        });
 
-  svg.selectAll(".y.axis")
-      .data(traits)
-    .enter().append("g")
-      .attr("class", "y axis")
-      .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
-      .each(function(d) { y.domain(domainByTrait[d]); d3.select(this).call(yAxis); });
+    // And horizontal
+    svg.selectAll(".y.axis")
+        .data(traits)
+        .enter().append("g")
+            .attr("class", "y axis")
+            .attr("transform", function(d, i) {
+                return "translate(0," + i * size + ")";
+            })
+        .each(function(d) {
+            y.domain(domainByTrait[d]);
+            d3.select(this).call(yAxis);
+        });
 
-  var cell = svg.selectAll(".cell")
-      .data(cross(traits, traits))
-    .enter().append("g")
-      .attr("class", "cell")
-      .attr("transform", function(d) { return "translate(" + (n - d.i - 1) * size + "," + d.j * size + ")"; })
-      .each(plot);
+    var cell = svg.selectAll(".cell")
+        .data(cross(traits, traits))
+        .enter().append("g")
+            .attr("class", "cell")
+            .attr("transform", function(d) {
+                return "translate(" + (n - d.i - 1) * size + "," + d.j * size + ")";
+            })
+        .each(plot);
 
-  // Titles for the diagonal.
-  cell.filter(function(d) { return d.i === d.j; }).append("text")
-      .attr("x", padding)
-      .attr("y", padding)
-      .attr("dy", ".71em")
-      .text(function(d) { return d.x; });
+    // Titles for the diagonal.
+    cell.filter(function(d) { return d.i === d.j; })
+        .append("text")
+            .attr("x", padding)
+            .attr("y", padding)
+            .attr("dy", ".71em")
+            .text(function(d) { return d.x; });
 
-  function plot(p) {
-    var cell = d3.select(this);
+    function plot(p) {
+        // p.x and p.y are actually the names of data columns
+        var cell = d3.select(this);
 
-    x.domain(domainByTrait[p.x]);
-    y.domain(domainByTrait[p.y]);
+        x.domain(domainByTrait[p.x]);
+        y.domain(domainByTrait[p.y]);
 
-    cell.append("rect")
-        .attr("class", "frame")
-        .attr("x", padding / 2)
-        .attr("y", padding / 2)
-        .attr("width", size - padding)
-        .attr("height", size - padding);
+        // Surely there must be some better place for this
+        cell.append("rect")
+            .attr("class", "frame")
+            .attr("x", padding / 2)
+            .attr("y", padding / 2)
+            .attr("width", size - padding)
+            .attr("height", size - padding);
 
-    cell.selectAll("circle")
-        .data(data)
-      .enter().append("circle")
-        .attr("cx", function(d) { return x(d[p.x]); })
-        .attr("cy", function(d) { return y(d[p.y]); })
-        .attr("r", 3)
-        .style("fill", function(d) { return color(d.species); });
-  }
+        // Create circles for every data point
+        cell.selectAll("circle")
+            .data(data)
+            .enter().append("circle")
+                .attr("cx", function(d) { return x(d[p.x]); })
+                .attr("cy", function(d) { return y(d[p.y]); })
+                .attr("r", 3)
+                .style("fill", function(d) { return color(d.species); });
+    }
 
-  function cross(a, b) {
-    // This function does something, what is it
-    var out = [];
+    function cross(a, b) {
+        // Generate 'cross-corelation' data ...
+        var out = [];
 
-    for (var i = 0; i < a.length; i++) {
-        for (var j = 0; j < b.length; j++) {
-            var val = {x: a[i],
+        for (var i = 0; i < a.length; i++) {
+            for (var j = 0; j < b.length; j++) {
+                // ... by simply creating a matrix of paired flower points
+                var val = {
+                       x: a[i],
                        i: i,
                        y: b[j],
-                       j: j};
-            out.push(val);
+                       j: j
+                };
+                out.push(val);
+            }
         }
+        return out;
     }
-    return out;
-  }
 
-  d3.select(self.frameElement).style("height", size * n + padding + 20 + "px");
+    d3.select(self.frameElement).style("height", size * n + padding + 20 + "px");
 });
