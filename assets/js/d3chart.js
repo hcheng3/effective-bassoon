@@ -20,9 +20,12 @@ var yAxis = d3.svg.axis()
 
 var color = d3.scale.category10();
 
-d3.csv("data/flowers.csv", function(error, data) {
-    if (error) throw error;
+// Load data
+d3.csv("data/flowers.csv", function(data) {
+    takeCareOfTheDatasetAsynchronicallyButWhyBecauseFuckYouThatsWhy(data);
+});
 
+function takeCareOfTheDatasetAsynchronicallyButWhyBecauseFuckYouThatsWhy(data) {
     var domainByTrait = {};
     var traits = d3.keys(data[0]).filter(function(d) { return d !== "species"; });
     var n = traits.length;
@@ -72,6 +75,7 @@ d3.csv("data/flowers.csv", function(error, data) {
             d3.select(this).call(yAxis);
         });
 
+    // Create plot holding cells
     var cell = svg.selectAll(".cell")
         .data(cross(traits, traits))
         .enter().append("g")
@@ -79,7 +83,7 @@ d3.csv("data/flowers.csv", function(error, data) {
             .attr("transform", function(d) {
                 return "translate(" + (n - d.i - 1) * size + "," + d.j * size + ")";
             })
-        .each(plot);
+        .each(plotGenerator(data, domainByTrait));
 
     // Titles for the diagonal.
     cell.filter(function(d) { return d.i === d.j; })
@@ -89,12 +93,19 @@ d3.csv("data/flowers.csv", function(error, data) {
             .attr("dy", ".71em")
             .text(function(d) { return d.x; });
 
-    function plot(p) {
+    // What is this
+    d3.select(self.frameElement).style("height", size * n + padding + 20 + "px");
+}
+
+function plotGenerator(data, domains) {
+    // It should be possible to simplify it further untile
+    // we can get something simple as plot(x_data, y_data)
+    return function(p) {
         // p.x and p.y are actually the names of data columns
         var cell = d3.select(this);
 
-        x.domain(domainByTrait[p.x]);
-        y.domain(domainByTrait[p.y]);
+        x.domain(domains[p.x]);
+        y.domain(domains[p.y]);
 
         // Surely there must be some better place for this
         cell.append("rect")
@@ -106,32 +117,31 @@ d3.csv("data/flowers.csv", function(error, data) {
 
         // Create circles for every data point
         cell.selectAll("circle")
-            .data(data)
+            .data(data) // wtf?
             .enter().append("circle")
                 .attr("cx", function(d) { return x(d[p.x]); })
                 .attr("cy", function(d) { return y(d[p.y]); })
                 .attr("r", 3)
                 .style("fill", function(d) { return color(d.species); });
-    }
+    };
+}
 
-    function cross(a, b) {
-        // Generate 'cross-corelation' data ...
-        var out = [];
+function cross(a, b) {
+    // Generate 'cross-corelation' data ...
+    var out = [];
 
-        for (var i = 0; i < a.length; i++) {
-            for (var j = 0; j < b.length; j++) {
-                // ... by simply creating a matrix of paired flower points
-                var val = {
-                       x: a[i],
-                       i: i,
-                       y: b[j],
-                       j: j
-                };
-                out.push(val);
-            }
+    for (var i = 0; i < a.length; i++) {
+        for (var j = 0; j < b.length; j++) {
+            // ... by simply creating a matrix of paired flower points
+            var val = {
+                   x: a[i],
+                   i: i,
+                   y: b[j],
+                   j: j
+            };
+            out.push(val);
         }
-        return out;
     }
+    return out;
+}
 
-    d3.select(self.frameElement).style("height", size * n + padding + 20 + "px");
-});
