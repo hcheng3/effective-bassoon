@@ -20,7 +20,7 @@ var yAxis = d3.svg.axis()
 
 var color = d3.scale.category10();
 
-// Load data
+// Load data, 
 d3.csv("data/flowers.csv", function(data) {
     takeCareOfTheDatasetAsynchronicallyButWhyBecauseFuckYouThatsWhy(data);
 });
@@ -98,7 +98,7 @@ function takeCareOfTheDatasetAsynchronicallyButWhyBecauseFuckYouThatsWhy(data) {
 }
 
 function plotGenerator(data, domains) {
-    // It should be possible to simplify it further untile
+    // It should be possible to simplify it further until
     // we can get something simple as plot(x_data, y_data)
     return function(p) {
         // p.x and p.y are actually the names of data columns
